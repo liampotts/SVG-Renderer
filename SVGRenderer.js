@@ -46,8 +46,28 @@ export class SVGRenderer {
         */
         
         // TODO
+        console.log("x,y", x,y)
+        var minx, miny, worldWidth, worldHeight
+        [minx, miny, worldWidth, worldHeight] = this.scene.viewBox.split(" ")
+        minx = Number(minx)
+        miny = Number(miny)
+        worldWidth = Number(worldWidth)+minx //have to do +1 bc there are 9 rows: 0 indexed
+        worldHeight = Number(worldHeight)+miny
+       
         
-        return [0, 0] // placeholder
+        
+        var colWidth = ((this.scene.width-1)/worldWidth)
+
+        var rowHeight =((this.scene.height-1)/worldHeight)
+        
+        console.log("colwidth and height", colWidth, rowHeight)
+        
+
+        console.log("row position and col pos ", Math.round((y)*rowHeight), Math.round((x)*colWidth))
+
+
+        
+        return [Math.round((y)*rowHeight), Math.round((x)*colWidth)] // correct in core task 1
     }
 
     render() {
@@ -55,6 +75,9 @@ export class SVGRenderer {
         Put all the pixels to light up the elements in scene.elements. 
         It will be necessary to parse the attributes of scene.elements, e.g. converting from strings to numbers.
         */
+        
+        console.log("this.scence: ",this.scene)
+
         for (const e of this.scene.elements) {
             if (e.type === 'point') {
                 const x = Number(e.x);
