@@ -46,12 +46,13 @@ export class SVGRenderer {
         */
         
         // TODO
+        
         console.log("x,y", x,y)
         var minx, miny, worldWidth, worldHeight
         [minx, miny, worldWidth, worldHeight] = this.scene.viewBox.split(" ")
         minx = Number(minx)
         miny = Number(miny)
-        worldWidth = Number(worldWidth)+minx //have to do +1 bc there are 9 rows: 0 indexed
+        worldWidth = Number(worldWidth)+minx 
         worldHeight = Number(worldHeight)+miny
        
         
@@ -75,9 +76,6 @@ export class SVGRenderer {
         Put all the pixels to light up the elements in scene.elements. 
         It will be necessary to parse the attributes of scene.elements, e.g. converting from strings to numbers.
         */
-        
-        console.log("this.scence: ",this.scene)
-
         for (const e of this.scene.elements) {
             if (e.type === 'point') {
                 const x = Number(e.x);
@@ -88,7 +86,21 @@ export class SVGRenderer {
                 this.putPixel(row, col, color[0], color[1], color[2], alpha);
             } else if (e.type === 'line') {
                 // TODO
-                console.error("Line has not been implemented."); // placeholder
+                const x0 = Number(e.x0)
+                const y0 = Number(e.y0)
+                
+                const x1 = Number(e.x1)
+                const y1 = Number(e.y1)
+                
+                const color = parseRGB(e.stroke)
+                
+                this.DrawLine(x0,y0,x1,y1, color)
+                
+                
+                
+                
+                
+    
 
             } else if (e.type === 'polyline') {
                 // TODO
@@ -102,6 +114,62 @@ export class SVGRenderer {
             }
         }
     }
+    
+    
+   lerp (i0, d0, i1, d1) {
+        console.log(d0)
+        console.log(i0)
+    if i0 == i1 {
+        console.log(d0)
+       return [d0]
+    }
+    values = []
+    a = (d1 - d0) / (i1 - i0)
+    d = d0
+    for i = i0 to i1 {
+        values.append(d)
+        d = d + a
+    }
+    return values
+}
+    
+    DrawLine(x0,y0,x1,y1, color) {
+    if abs(x1 - x0) > abs(y1 - y0) {
+        // Line is horizontal-ish
+        // Make sure x0 < x1
+        if x0 > x1 {
+            swap(x0, x1)
+            swap(y0, y1)
+        }
+        
+        console.log(x0,x1,y0,y1)
+        
+        ys = lerp(x0, y0, x1, y1)
+        for x = x0 to x1 {
+            canvas.PutPixel(x, ys[x - x0], color)
+        }
+    } else {
+        // Line is vertical-ish
+        // Make sure y0 < y1
+        if y0 > y1 {
+            swap(x0, x1)
+            swap(y0, y1)    
+        }
+        
+         console.log(x0,x1,y0,y1)
+        xs = lerp(y0, x0, y1, x1)
+        for y = y0 to y1 {
+            canvas.PutPixel(xs[y - y0], y, color)
+        }
+    }
+}
+    
+    
+    
+    
+    
+    
+    
 }
 
 function parseRGB(colorString) {
