@@ -11,6 +11,7 @@ export class SVGRenderer {
     }
 
     putPixel(row, col, r, g, b) { 
+        col = 
         /*
         Update one pixel in the image array. (r,g,b) are 0-255 color values.
         */
@@ -47,7 +48,6 @@ export class SVGRenderer {
         
         // TODO
         
-        console.log("x,y", x,y)
         var minx, miny, worldWidth, worldHeight
         [minx, miny, worldWidth, worldHeight] = this.scene.viewBox.split(" ")
         minx = Number(minx)
@@ -60,11 +60,7 @@ export class SVGRenderer {
         var colWidth = ((this.scene.width-1)/worldWidth)
 
         var rowHeight =((this.scene.height-1)/worldHeight)
-        
-        console.log("colwidth and height", colWidth, rowHeight)
-        
 
-        console.log("row position and col pos ", Math.round((y)*rowHeight), Math.round((x)*colWidth))
 
 
         
@@ -86,11 +82,11 @@ export class SVGRenderer {
                 this.putPixel(row, col, color[0], color[1], color[2], alpha);
             } else if (e.type === 'line') {
                 // TODO
-                const x0 = Number(e.x0)
-                const y0 = Number(e.y0)
+                const x0 = Number(e.x1)
+                const y0 = Number(e.y1)
                 
-                const x1 = Number(e.x1)
-                const y1 = Number(e.y1)
+                const x1 = Number(e.x2)
+                const y1 = Number(e.y2)
                 
                 const color = parseRGB(e.stroke)
                 
@@ -117,49 +113,49 @@ export class SVGRenderer {
     
     
    lerp (i0, d0, i1, d1) {
-        console.log(d0)
-        console.log(i0)
-    if i0 == i1 {
-        console.log(d0)
+      
+    if (i0 == i1) {
        return [d0]
     }
-    values = []
-    a = (d1 - d0) / (i1 - i0)
-    d = d0
-    for i = i0 to i1 {
-        values.append(d)
+    var values = []
+    var a = (d1 - d0) / (i1 - i0)
+    var d = d0
+    for (var i = i0; i < i1; i++) {
+        values.push(d)
         d = d + a
     }
     return values
 }
     
     DrawLine(x0,y0,x1,y1, color) {
-    if abs(x1 - x0) > abs(y1 - y0) {
+    if (Math.abs(x1 - x0) > Math.abs(y1 - y0)) {
         // Line is horizontal-ish
         // Make sure x0 < x1
-        if x0 > x1 {
+        if (x0 > x1) {
             swap(x0, x1)
             swap(y0, y1)
         }
-        
-        console.log(x0,x1,y0,y1)
-        
-        ys = lerp(x0, y0, x1, y1)
-        for x = x0 to x1 {
-            canvas.PutPixel(x, ys[x - x0], color)
+        var ys = this.lerp(x0, y0, x1, y1)
+       // var [r,g,b] = (color)
+
+        for (var x = x0; x <x1; x++) {
+            console.log(ys[x - x0])
+           // this.putPixel(x, ys[x - x0], r,g,b)
+            this.closestPixelTo(Math.round())
         }
     } else {
         // Line is vertical-ish
         // Make sure y0 < y1
-        if y0 > y1 {
+        if (y0 > y1) {
             swap(x0, x1)
             swap(y0, y1)    
         }
         
-         console.log(x0,x1,y0,y1)
-        xs = lerp(y0, x0, y1, x1)
-        for y = y0 to y1 {
-            canvas.PutPixel(xs[y - y0], y, color)
+        var xs = this.lerp(y0, x0, y1, x1)
+        var [r,g,b] = (color)
+
+         for (var y = y0; y < y1; y++) {
+            this.putPixel(xs[y - y0], y, r,g,b)
         }
     }
 }
@@ -191,6 +187,7 @@ function parseRGB(colorString) {
         console.error(`Could not parse color string ${colorString}`);
         return [0, 0, 0];
     }
+    
     return [Number(parsed[1]), Number(parsed[2]), Number(parsed[3])];
 }
 
