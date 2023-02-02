@@ -11,7 +11,7 @@ export class SVGRenderer {
     }
 
     putPixel(row, col, r, g, b) { 
-        col = 
+     
         /*
         Update one pixel in the image array. (r,g,b) are 0-255 color values.
         */
@@ -138,10 +138,9 @@ export class SVGRenderer {
         var ys = this.lerp(x0, y0, x1, y1)
        // var [r,g,b] = (color)
 
-        for (var x = x0; x <x1; x++) {
-            console.log(ys[x - x0])
+        for (var i = 0; i < ys.length; i++) {
            // this.putPixel(x, ys[x - x0], r,g,b)
-            this.closestPixelTo(Math.round())
+            this.closestPixelTo(Math.round(ys[i]), x0+i)
         }
     } else {
         // Line is vertical-ish
@@ -154,8 +153,9 @@ export class SVGRenderer {
         var xs = this.lerp(y0, x0, y1, x1)
         var [r,g,b] = (color)
 
-         for (var y = y0; y < y1; y++) {
-            this.putPixel(xs[y - y0], y, r,g,b)
+         for (var i = 0; i < xs.length; i++) {
+           // this.putPixel(x, ys[x - x0], r,g,b)
+            this.closestPixelTo(y0+i), Math.round(xs[i])
         }
     }
 }
