@@ -52,19 +52,25 @@ export class SVGRenderer {
         [minx, miny, worldWidth, worldHeight] = this.scene.viewBox.split(" ")
         minx = Number(minx)
         miny = Number(miny)
-        worldWidth = Number(worldWidth)+minx 
-        worldHeight = Number(worldHeight)+miny
+        worldWidth = Number(worldWidth)
+        worldHeight = Number(worldHeight)
        
         
-        
+       
         var colWidth = ((this.scene.width-1)/worldWidth)
 
         var rowHeight =((this.scene.height-1)/worldHeight)
-
+        
+//        console.log("world with and height", worldWidth, worldHeight)
+//        console.log("viewbox", [minx, miny, worldWidth, worldHeight])
+//
+//        console.log("col width and row height", colWidth, rowHeight)
+//        console.log("x,y given", x,y)
+        console.log("pts plotted", (Math.round((y)*rowHeight))-(miny*rowHeight), (Math.round((x)*colWidth))-(minx*colWidth))
 
 
         
-        return [Math.round((y)*rowHeight), Math.round((x)*colWidth)] // correct in core task 1
+        return [Math.round((y*rowHeight)-(miny*rowHeight)), Math.round((x*colWidth)-(minx*colWidth))] // correct in core task 1
     }
 
     render() {
@@ -112,53 +118,58 @@ export class SVGRenderer {
     }
     
     
-   lerp (i0, d0, i1, d1) {
-      
-    if (i0 == i1) {
-       return [d0]
+   lerp (t0, y0, t1, y1) {
+    console.log("lerp values", t0,y0,t1,y1)
+    
+    var values = [y0]
+    var y = y0
+    for (var t = t0; t <= t1; t++) {
+        y += (y1-y0)/(t1-t0)
+        values.push(y)
     }
-    var values = []
-    var a = (d1 - d0) / (i1 - i0)
-    var d = d0
-    for (var i = i0; i < i1; i++) {
-        values.push(d)
-        d = d + a
-    }
+    
     return values
 }
     
     DrawLine(x0,y0,x1,y1, color) {
-    if (Math.abs(x1 - x0) > Math.abs(y1 - y0)) {
-        // Line is horizontal-ish
-        // Make sure x0 < x1
-        if (x0 > x1) {
-            swap(x0, x1)
-            swap(y0, y1)
-        }
-        var ys = this.lerp(x0, y0, x1, y1)
-       // var [r,g,b] = (color)
+        console.log("DRAWLINE STARTING")
 
-        for (var i = 0; i < ys.length; i++) {
-           // this.putPixel(x, ys[x - x0], r,g,b)
-            this.closestPixelTo(Math.round(ys[i]), x0+i)
-        }
-    } else {
-        // Line is vertical-ish
-        // Make sure y0 < y1
-        if (y0 > y1) {
-            swap(x0, x1)
-            swap(y0, y1)    
-        }
-        
-        var xs = this.lerp(y0, x0, y1, x1)
-        var [r,g,b] = (color)
+        if (Math.abs(x1 - x0) > Math.abs(y1 - y0)) {
+            // Line is horizontal-ish
+            // Make sure x0 < x1
+            if (x0 > x1) {
+                swap(x0, x1)
+                swap(y0, y1)
+            }
+            var ys = this.lerp(x0, y0, x1, y1)
+            console.log("ys", ys)
+            var [r,g,b] = (color)
 
-         for (var i = 0; i < xs.length; i++) {
-           // this.putPixel(x, ys[x - x0], r,g,b)
-            this.closestPixelTo(y0+i), Math.round(xs[i])
+            for (var i = 0; i < ys.length; i++) {
+               // this.putPixel(x, ys[x - x0], r,g,b)
+                console.log("pts plotting in drawline for horizontal line", (ys[i]), x0+i)
+                this.putPixel(Math.round(ys[i]), x0+i, r, g, b)
+            }
+        } else {
+            // Line is vertical-ish
+            // Make sure y0 < y1
+            if (y0 > y1) {
+                swap(x0, x1)
+                swap(y0, y1)    
+            }
+
+            var xs = this.lerp(y0, x0, y1, x1)
+            console.log("xs", xs)
+            var [r,g,b] = (color)
+
+             for (var i = 0; i < xs.length; i++) {
+               // this.putPixel(x, ys[x - x0], r,g,b)
+                 console.log("pts plotting draw line vertical", y0+i), Math.round(xs[i])
+                this.putPixel((y0+i), Math.round(xs[i]), r,g,b)
+            }
         }
+        console.log("DRAWLINE ENDING")
     }
-}
     
     
     
