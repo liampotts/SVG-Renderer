@@ -11,6 +11,7 @@ export class SVGRenderer {
     }
 
     putPixel(row, col, r, g, b) { 
+        //input needs to be in canvas coordinates not world
      
         /*
         Update one pixel in the image array. (r,g,b) are 0-255 color values.
@@ -66,7 +67,7 @@ export class SVGRenderer {
 //
 //        console.log("col width and row height", colWidth, rowHeight)
 //        console.log("x,y given", x,y)
-        console.log("pts plotted", (Math.round((y)*rowHeight))-(miny*rowHeight), (Math.round((x)*colWidth))-(minx*colWidth))
+ //       console.log("pts plotted", (Math.round((y)*rowHeight))-(miny*rowHeight), (Math.round((x)*colWidth))-(minx*colWidth))
 
 
         
@@ -114,9 +115,23 @@ export class SVGRenderer {
     
     
    lerp (t0, y0, t1, y1) {
-        console.log("lerp values", t0,y0,t1,y1)
+       
+        var minx, miny, worldWidth, worldHeight
+        [minx, miny, worldWidth, worldHeight] = this.scene.viewBox.split(" ")
+        minx = Number(minx)
+        miny = Number(miny)
+        worldWidth = Number(worldWidth)
+        worldHeight = Number(worldHeight)
+       
+        var colWidth = ((this.scene.width-1)/worldWidth)
+        var rowHeight =((this.scene.height-1)/worldHeight)
+        
+        y0 = Math.round((y0*rowHeight)-(miny*rowHeight))
+       y1 = Math.round((y1*rowHeight)-(miny*rowHeight))
+        t0 = Math.round((t0*colWidth)-(minx*colWidth))
+       t1 = Math.round((t1*colWidth)-(minx*colWidth))
 
-        var values = [y0, y1]
+        var values = []
         var y = y0
         for (var t = t0; t <= t1; t++) {
             y += (y1-y0)/(t1-t0)
@@ -126,9 +141,7 @@ export class SVGRenderer {
         return values
    }
     
-    DrawLine(x0,y0,x1,y1, color) {
-        console.log("DRAWLINE STARTING")
-        
+    DrawLine(x0,y0,x1,y1, color) {        
         var minx, miny, worldWidth, worldHeight
         [minx, miny, worldWidth, worldHeight] = this.scene.viewBox.split(" ")
         minx = Number(minx)
@@ -149,14 +162,12 @@ export class SVGRenderer {
                 swap(y0, y1)
             }
             var ys = this.lerp(x0, y0, x1, y1)
-            console.log("ys", ys)
             var [r,g,b] = (color)
 
             for (var i = 0; i < ys.length; i++) {
-                console.log("pts plotting in drawline for horizontal line", (ys[i]), x0+i)
-                console.log("pixel pts", Math.round((ys[i]*rowHeight)-(miny*rowHeight)), Math.round(((x0+i)*colWidth)-(minx*colWidth)))
-                this.putPixel(Math.round((ys[i]*rowHeight)-(miny*rowHeight)), Math.round(((x0+i)*colWidth)-(minx*colWidth)), r, g, b)
+                this.putPixel(Math.round((ys[i])), Math.round((x0+i)), r, g, b)
             }
+            
         } else {
             // Line is vertical-ish
             // Make sure y0 < y1
@@ -169,13 +180,10 @@ export class SVGRenderer {
             console.log("xs", xs)
             var [r,g,b] = (color)
 
-             for (var i = 0; i < xs.length; i++) {
-               // this.putPixel(x, ys[x - x0], r,g,b)
-                 console.log("pts plotting draw line vertical", y0+i), Math.round(xs[i])
-                this.putPixel(Math.round(((y0+i)*rowHeight)-(miny*rowHeight)), Math.round((xs[i]*colWidth)-(minx*colWidth)), r,g,b)
+            for (var i = 0; i < xs.length; i++) {
+                this.putPixel(Math.round((y0+i)*rowHeight), Math.round(xs[i]*colWidth), r,g,b)
             }
         }
-        console.log("DRAWLINE ENDING")
     }
     
     
