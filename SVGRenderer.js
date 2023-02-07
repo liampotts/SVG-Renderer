@@ -47,7 +47,7 @@ export class SVGRenderer {
         The point (maxX, maxY) is the center of the pixel in the last row and the last column
         */
         
-        // TODO
+       
         
         var minx, miny, worldWidth, worldHeight
         [minx, miny, worldWidth, worldHeight] = this.scene.viewBox.split(" ")
@@ -67,7 +67,7 @@ export class SVGRenderer {
 //
 //        console.log("col width and row height", colWidth, rowHeight)
 //        console.log("x,y given", x,y)
- //       console.log("pts plotted", (Math.round((y)*rowHeight))-(miny*rowHeight), (Math.round((x)*colWidth))-(minx*colWidth))
+//       console.log("pts plotted", (Math.round((y)*rowHeight))-(miny*rowHeight), (Math.round((x)*colWidth))-(minx*colWidth))
 
 
         
@@ -80,6 +80,8 @@ export class SVGRenderer {
         It will be necessary to parse the attributes of scene.elements, e.g. converting from strings to numbers.
         */
         for (const e of this.scene.elements) {
+            
+            //console.log(e)
             if (e.type === 'point') {
                 const x = Number(e.x);
                 const y = Number(e.y);
@@ -87,22 +89,45 @@ export class SVGRenderer {
                 const alpha = Number(e.opacity) || 1;
                 const [row, col] = this.closestPixelTo(x, y);
                 this.putPixel(row, col, color[0], color[1], color[2], alpha);
-            } else if (e.type === 'line') {
-                // TODO
-                const x0 = Number(e.x1)
-                const y0 = Number(e.y1)
                 
+                
+                
+                
+            } else if (e.type === 'line') {
+    
+                const x0 = Number(e.x1)
+                const y0 = Number(e.y1) 
                 const x1 = Number(e.x2)
                 const y1 = Number(e.y2)
-                
                 const color = parseRGB(e.stroke)
-                
                 this.DrawLine(x0,y0,x1,y1, color)
                 
 
             } else if (e.type === 'polyline') {
-                // TODO
-                console.error("Polyline has not been implemented"); // placeholder
+                
+                const color = parseRGB(e.stroke)
+                
+                
+                const points = parsePoints(e.points)
+                
+                console.log(points)
+                
+                for (var i=0; i<points.length-1; i++){
+                   
+                   var x0 = points[i][0]
+                   var y0 = points[i][1]
+                   var x1 = points[i+1][0]
+                   var y1 = points[i+1][1]
+                   
+                   this.DrawLine(x0,y0,x1,y1, color)
+                
+                    
+                }
+        
+               
+  
+                
+                //console.error("Polyline has not been implemented"); // placeholder
 
             } else if (e.type === 'polygon') {
                 const pointsArray = parsePoints(e.points);
@@ -142,25 +167,35 @@ export class SVGRenderer {
    }
     
     DrawLine(x0,y0,x1,y1, color) {        
-        var minx, miny, worldWidth, worldHeight
-        [minx, miny, worldWidth, worldHeight] = this.scene.viewBox.split(" ")
-        minx = Number(minx)
-        miny = Number(miny)
-        worldWidth = Number(worldWidth)
-        worldHeight = Number(worldHeight)
-       
-        var colWidth = ((this.scene.width-1)/worldWidth)
-        var rowHeight =((this.scene.height-1)/worldHeight)
         
+//        var minx, miny, worldWidth, worldHeight
+//        [minx, miny, worldWidth, worldHeight] = this.scene.viewBox.split(" ")
+//        minx = Number(minx)
+//        miny = Number(miny)
+//        worldWidth = Number(worldWidth)
+//        worldHeight = Number(worldHeight)
+//       
+//        var colWidth = ((this.scene.width-1)/worldWidth)
+//        var rowHeight =((this.scene.height-1)/worldHeight)
+//        
       
+        var row0, col0, row1, col1
+        
+        row0,col0 = this.closestPixelTo(x0,y0)
+        row1,col1 = this.closestPixelTo(x1,y1)
 
         if (Math.abs(x1 - x0) > Math.abs(y1 - y0)) {
             // Line is horizontal-ish
             // Make sure x0 < x1
-            if (x0 > x1) {
-                swap(x0, x1)
-                swap(y0, y1)
+            if (x0 > x1) {  
+                //swap(x0, x1)
+                //swap(y0, y1)
+                
+                [x0,x1] = [x1,x0]
+                [y0,y1] = [y1,y0]  
+                
             }
+            
             var ys = this.lerp(x0, y0, x1, y1)
             var [r,g,b] = (color)
 
@@ -172,8 +207,12 @@ export class SVGRenderer {
             // Line is vertical-ish
             // Make sure y0 < y1
             if (y0 > y1) {
-                swap(x0, x1)
-                swap(y0, y1)    
+                
+//                swap(x0, x1)
+//                swap(y0, y1)
+//                
+                [x0,x1] = [x1,x0]
+                [y0,y1] = [y1,y0]
             }
 
             var xs = this.lerp(y0, x0, y1, x1)
@@ -181,16 +220,10 @@ export class SVGRenderer {
             var [r,g,b] = (color)
 
             for (var i = 0; i < xs.length; i++) {
-                this.putPixel(Math.round((y0+i)*rowHeight), Math.round(xs[i]*colWidth), r,g,b)
+                this.putPixel(Math.round((y0+i)), Math.round(xs[i]), r,g,b)
             }
         }
     }
-    
-    
-    
-    
-    
-    
     
 }
 
