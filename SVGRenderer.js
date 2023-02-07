@@ -1,5 +1,8 @@
 /* A skeleton of this file was written by Duncan Levear in Spring 2023 for CS3333 at Boston College */
 
+
+//IN CLASS HELLO
+
 export class SVGRenderer {
     constructor(sceneInfo, image) {
         this.scene = sceneInfo;
@@ -47,19 +50,14 @@ export class SVGRenderer {
         The point (maxX, maxY) is the center of the pixel in the last row and the last column
         */
         
-       
-        
         var minx, miny, worldWidth, worldHeight
         [minx, miny, worldWidth, worldHeight] = this.scene.viewBox.split(" ")
         minx = Number(minx)
         miny = Number(miny)
         worldWidth = Number(worldWidth)
         worldHeight = Number(worldHeight)
-       
-        
-       
+                
         var colWidth = ((this.scene.width-1)/worldWidth)
-
         var rowHeight =((this.scene.height-1)/worldHeight)
         
 //        console.log("world with and height", worldWidth, worldHeight)
@@ -67,10 +65,8 @@ export class SVGRenderer {
 //
 //        console.log("col width and row height", colWidth, rowHeight)
 //        console.log("x,y given", x,y)
-//       console.log("pts plotted", (Math.round((y)*rowHeight))-(miny*rowHeight), (Math.round((x)*colWidth))-(minx*colWidth))
+//        console.log("pts plotted", (Math.round((y)*rowHeight))-(miny*rowHeight), (Math.round((x)*colWidth))-(minx*colWidth))
 
-
-        
         return [Math.round((y*rowHeight)-(miny*rowHeight)), Math.round((x*colWidth)-(minx*colWidth))]
     }
 
@@ -106,8 +102,7 @@ export class SVGRenderer {
             } else if (e.type === 'polyline') {
                 
                 const color = parseRGB(e.stroke)
-                
-                
+        
                 const points = parsePoints(e.points)
                 
                 console.log(points)
@@ -118,7 +113,7 @@ export class SVGRenderer {
                    var y0 = points[i][1]
                    var x1 = points[i+1][0]
                    var y1 = points[i+1][1]
-                   
+        
                    this.DrawLine(x0,y0,x1,y1, color)
                 
                     
@@ -139,35 +134,8 @@ export class SVGRenderer {
     }
     
     
-   lerp (t0, y0, t1, y1) {
+   lerp (i0, d0, i1, d1) {
        
-        var minx, miny, worldWidth, worldHeight
-        [minx, miny, worldWidth, worldHeight] = this.scene.viewBox.split(" ")
-        minx = Number(minx)
-        miny = Number(miny)
-        worldWidth = Number(worldWidth)
-        worldHeight = Number(worldHeight)
-       
-        var colWidth = ((this.scene.width-1)/worldWidth)
-        var rowHeight =((this.scene.height-1)/worldHeight)
-        
-        y0 = Math.round((y0*rowHeight)-(miny*rowHeight))
-       y1 = Math.round((y1*rowHeight)-(miny*rowHeight))
-        t0 = Math.round((t0*colWidth)-(minx*colWidth))
-       t1 = Math.round((t1*colWidth)-(minx*colWidth))
-
-        var values = []
-        var y = y0
-        for (var t = t0; t <= t1; t++) {
-            y += (y1-y0)/(t1-t0)
-            values.push(y)
-        }
-
-        return values
-   }
-    
-    DrawLine(x0,y0,x1,y1, color) {        
-        
 //        var minx, miny, worldWidth, worldHeight
 //        [minx, miny, worldWidth, worldHeight] = this.scene.viewBox.split(" ")
 //        minx = Number(minx)
@@ -178,49 +146,82 @@ export class SVGRenderer {
 //        var colWidth = ((this.scene.width-1)/worldWidth)
 //        var rowHeight =((this.scene.height-1)/worldHeight)
 //        
-      
+//        y0 = Math.round((y0*rowHeight)-(miny*rowHeight))
+//       y1 = Math.round((y1*rowHeight)-(miny*rowHeight))
+//        t0 = Math.round((t0*colWidth)-(minx*colWidth))
+//       t1 = Math.round((t1*colWidth)-(minx*colWidth))
+
+       
+       if (i0 == i1){
+           return [d0]
+       }
+       
+    
+        var values = []
+        var a = (d1 - d0) / (i1 - i0)
+        var d = d0
+        for (var i = i0; i < i1; i++) {
+            console.log("inside lerp:"+ d)
+            values.push(d)
+            d = d+a
+        }
+
+        return values
+   }
+    
+    
+    DrawLine(x0,y0,x1,y1, color) {        
+        
         var row0, col0, row1, col1
         
         row0,col0 = this.closestPixelTo(x0,y0)
         row1,col1 = this.closestPixelTo(x1,y1)
-
-        if (Math.abs(x1 - x0) > Math.abs(y1 - y0)) {
+        var [r,g,b] = (color)
+        
+        
+        console.log(row0,col0)
+        console.log(row1,col1)
+     
+        if (Math.abs(col1 - col0) > Math.abs(row1 - row0)) {
             // Line is horizontal-ish
             // Make sure x0 < x1
-            if (x0 > x1) {  
+            if (col0 > col1) {  
                 //swap(x0, x1)
                 //swap(y0, y1)
                 
-                [x0,x1] = [x1,x0]
-                [y0,y1] = [y1,y0]  
+                [col0,col1] = [col1,col0]
+                [row0,row1] = [row1,row0]  
                 
             }
             
-            var ys = this.lerp(x0, y0, x1, y1)
-            var [r,g,b] = (color)
+     
+            var ys = this.lerp(col0, row0, col1, row1)
 
-            for (var i = 0; i < ys.length; i++) {
-                this.putPixel(Math.round((ys[i])), Math.round((x0+i)), r, g, b)
+            for (var i = col0; i < col1; i++) {
+                
+                console.log(Math.round(i))
+                console.log(Math.round(ys[i-col0]))
+                this.putPixel(Math.round(i), Math.round(ys[i-col0]), r, g, b)
             }
             
         } else {
             // Line is vertical-ish
             // Make sure y0 < y1
-            if (y0 > y1) {
+            if (row0 > row1) {
                 
 //                swap(x0, x1)
 //                swap(y0, y1)
 //                
-                [x0,x1] = [x1,x0]
-                [y0,y1] = [y1,y0]
+                [col0, col1] = [col1,col0]
+                [row0,row1] = [row1,row0]
             }
 
-            var xs = this.lerp(y0, x0, y1, x1)
+            var xs = this.lerp(col0, row0, col1, row1)
             console.log("xs", xs)
-            var [r,g,b] = (color)
+           
 
-            for (var i = 0; i < xs.length; i++) {
-                this.putPixel(Math.round((y0+i)), Math.round(xs[i]), r,g,b)
+            for (var i = row0; i < row1; i++) {
+                this.putPixel(Math.round(xs[i-row0]), Math.round(i), r,g,b)
             }
         }
     }
