@@ -105,10 +105,8 @@ export class SVGRenderer {
                 const color = parseRGB(e.stroke)
         
                 const points = parsePoints(e.points)
-                
-                console.log(points)
-                
-                for (var i=0; i<points.length-1; i++){
+                                
+                for (var i=0; i < points.length-1; i++){
                    
                    var x0 = points[i][0]
                    var y0 = points[i][1]
@@ -129,22 +127,21 @@ export class SVGRenderer {
     
     
    lerp (t0, y0, t1, y1) {
-
-
+       if (t0 == t1) {
+           return [y0]
+       }
         const values = []
         var y = y0
         for (var t = t0; t <= t1; t++) {
-
-            y += (y1-y0)/(t1-t0)
             values.push(y)
+            y += (y1-y0)/(t1-t0)
+            
         }
-
         return values
    }
     
     DrawLine(x0,y0,x1,y1, color) { 
 
-        
         const new_first = this.closestPixelTo(x0,y0)
         y0 = new_first[0]
         x0 = new_first[1]
@@ -160,37 +157,48 @@ export class SVGRenderer {
             // Line is horizontal-ish
             // Make sure x0 < x1
             if (x0 > x1) {
+                const old_x0 = x0
+                const old_y0 = y0
                 x0 = x1
-                x1 = x0
-                
+                x1 = old_x0
                 y0 = y1
-                y1 = y0
+                y1 = old_y0
             }
-            
-            var [r,g,b] = (color)
+
             var ys = this.lerp(x0, y0, x1, y1)
-            
             for (var i = 0; i < ys.length; i++) {
+           
                 this.putPixel(Math.round((ys[i])), Math.round(x0+i), r, g, b)
             }
+            
+//            for (var x = x0; x <= x1; x++) {
+//                
+//                this.putPixel(x, Math.round(ys[x-x0]), r,g,b)
+//            }
+           
             
         } else {
             // Line is vertical-ish
             // Make sure y0 < y1
             if (y0 > y1) {
+                const old_x0 = x0
+                const old_y0 = y0
                 x0 = x1
-                x1 = x0
+                x1 = old_x0
                 y0 = y1
-                y1 = y0
+                y1 = old_y0
             }
 
             var xs = this.lerp(y0, x0, y1, x1)
-            var [r,g,b] = (color)
 
             for (var i = 0; i < xs.length; i++) {
-                
-                this.putPixel(Math.round((y0+i)), Math.round(xs[i]), r,g,b)
+                this.putPixel(Math.round(y0+i), Math.round(xs[i]), r,g,b)
             }
+            
+//            for (var y = y0; y <= y1; y++) {
+//                
+//                this.putPixel(Math.round(xs[y-y0]), y, r,g,b)
+//            }
         }
     }
     
