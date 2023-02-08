@@ -120,7 +120,6 @@ export class SVGRenderer {
                 const pointsArray = parsePoints(e.points);
                 const triangles = triangulate(pointsArray);
                 // TODO
-                console.log(triangles)
                 const color_poly = parseRGB(e.stroke)
                 
                 for (var tri =0; tri < triangles.length; tri++){ //each triangle
@@ -131,8 +130,8 @@ export class SVGRenderer {
                     y1 = triangles[tri][1][1]
                     var x2 = triangles[tri][2][0]
                     var y2 = triangles[tri][2][1]
-                  
-                
+                    
+                 //sort 
                 if (y1 < y0 ){
                     const old_x0 = x0
                     const old_y0 = y0
@@ -157,11 +156,57 @@ export class SVGRenderer {
                     y1 = y2
                     y2 = old_y1
                 }
-                console.log(y0,y1,y2)
                 
-                this.DrawLine(x0,y0,x1,y1, color_poly)
-                this.DrawLine(x1,y1,x2,y2, color_poly)
-                this.DrawLine(x0,y0,x2,y2, color_poly)
+//                this.DrawLine(x0,y0,x1,y1, color_poly)
+//                this.DrawLine(x1,y1,x2,y2, color_poly)
+//                this.DrawLine(x0,y0,x2,y2, color_poly)
+                    
+                //convert to canvas
+                const new_first = this.closestPixelTo(x0,y0)
+                y0 = new_first[0]
+                x0 = new_first[1]
+                const new_second = this.closestPixelTo(x1,y1)
+                y1 = new_second[0]
+                x1 = new_second[1]
+
+                const new_third = this.closestPixelTo(x2,y2)
+                y2 = new_second[0]
+                x2 = new_second[1]
+                  
+                //computer x coordinates of triangle edges
+                var x01 = this.lerp(y0, x0, y1, x1)
+                var x12 = this.lerp(y1, x1, y2, x2)
+                var x02 = this.lerp(y0, x0, y2, x2)
+                console.log(x02)
+                    
+                //concatenate short sides
+                x01.pop()
+                var x012 = x01.concat(x12)
+                
+                //determine which is left and right
+                const m = Math.floor(x02.length / 2)
+                if (x02[m] < x012[m]) {
+                    var x_left = x02
+                    var x_right = x012
+                    console.log("if", x_left)
+                } else {
+                    var x_left = x012
+                    var x_right = x02
+                    console.log("eklse", x_left)
+                }
+                
+                 
+                //draw horizontal segments
+                for (var y = y0; y <= y2; y++) {
+                    for(var x = x_left[y-y0]; x <= x_right[y-y0]; x++) {
+                        this.putPixel(x,y, color_poly[0], color_poly[1], color_poly[2])
+                        }
+                }
+                
+                    
+                    
+                
+                
                 }
                 
                 
