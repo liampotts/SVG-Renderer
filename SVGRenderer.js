@@ -120,7 +120,7 @@ export class SVGRenderer {
                 const pointsArray = parsePoints(e.points);
                 const triangles = triangulate(pointsArray);
                 // TODO
-                const color_poly = parseRGB(e.stroke)
+                const color_poly = parseRGB(e.fill)
                 
                 for (var tri =0; tri < triangles.length; tri++){ //each triangle
                 
@@ -160,9 +160,9 @@ export class SVGRenderer {
                     }
 
 
-    //                this.DrawLine(x0,y0,x1,y1, color_poly)
-    //                this.DrawLine(x1,y1,x2,y2, color_poly)
-    //                this.DrawLine(x0,y0,x2,y2, color_poly)
+                    this.DrawLine(x0,y0,x1,y1, color_poly)
+                    this.DrawLine(x1,y1,x2,y2, color_poly)
+                    this.DrawLine(x0,y0,x2,y2, color_poly)
 
                     //convert to canvas
                     const new_first = this.closestPixelTo(x0,y0)
