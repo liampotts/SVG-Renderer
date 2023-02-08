@@ -124,89 +124,92 @@ export class SVGRenderer {
                 
                 for (var tri =0; tri < triangles.length; tri++){ //each triangle
                 
-                    x0 = triangles[tri][0][0]
-                    y0 = triangles[tri][0][1]
-                    x1 = triangles[tri][1][0]
-                    y1 = triangles[tri][1][1]
+                    var x0 = triangles[tri][0][0]
+                    var y0 = triangles[tri][0][1]
+                    var x1 = triangles[tri][1][0]
+                    var y1 = triangles[tri][1][1]
                     var x2 = triangles[tri][2][0]
                     var y2 = triangles[tri][2][1]
-                    
-                 //sort 
-                if (y1 < y0 ){
-                    const old_x0 = x0
-                    const old_y0 = y0
-                    x0 = x1
-                    x1 = old_x0
-                    y0 = y1
-                    y1 = old_y0
-                }
-                if (y2 < y0 ){
-                    const old_x0 = x0
-                    const old_y0 = y0
-                    x0 = x2
-                    x2 = old_x0
-                    y0 = y2
-                    y2 = old_y0
-                }
-                if (y2 < y1 ){
-                    const old_x1 = x1
-                    const old_y1 = y1
-                    x1 = x2
-                    x2 = old_x1
-                    y1 = y2
-                    y2 = old_y1
-                }
                 
-//                this.DrawLine(x0,y0,x1,y1, color_poly)
-//                this.DrawLine(x1,y1,x2,y2, color_poly)
-//                this.DrawLine(x0,y0,x2,y2, color_poly)
                     
-                //convert to canvas
-                const new_first = this.closestPixelTo(x0,y0)
-                y0 = new_first[0]
-                x0 = new_first[1]
-                const new_second = this.closestPixelTo(x1,y1)
-                y1 = new_second[0]
-                x1 = new_second[1]
+                    
+                     //sort 
+                    if (y1 < y0 ){
+                        const old_x0 = x0
+                        const old_y0 = y0
+                        x0 = x1
+                        x1 = old_x0
+                        y0 = y1
+                        y1 = old_y0
+                    }
+                    if (y2 < y0 ){
+                        const old_x0 = x0
+                        const old_y0 = y0
+                        x0 = x2
+                        x2 = old_x0
+                        y0 = y2
+                        y2 = old_y0
+                    }
+                    if (y2 < y1 ){
+                        const old_x1 = x1
+                        const old_y1 = y1
+                        x1 = x2
+                        x2 = old_x1
+                        y1 = y2
+                        y2 = old_y1
+                    }
 
-                const new_third = this.closestPixelTo(x2,y2)
-                y2 = new_second[0]
-                x2 = new_second[1]
-                  
-                //computer x coordinates of triangle edges
-                var x01 = this.lerp(y0, x0, y1, x1)
-                var x12 = this.lerp(y1, x1, y2, x2)
-                var x02 = this.lerp(y0, x0, y2, x2)
-                console.log(x02)
+
+    //                this.DrawLine(x0,y0,x1,y1, color_poly)
+    //                this.DrawLine(x1,y1,x2,y2, color_poly)
+    //                this.DrawLine(x0,y0,x2,y2, color_poly)
+
+                    //convert to canvas
+                    const new_first = this.closestPixelTo(x0,y0)
+                    y0 = new_first[0]
+                    x0 = new_first[1]
+                    const new_second = this.closestPixelTo(x1,y1)
+                    y1 = new_second[0]
+                    x1 = new_second[1]
+
+                    const new_third = this.closestPixelTo(x2,y2)
+                    y2 = new_third[0]
+                    x2 = new_third[1]
+
+                    //computer x coordinates of triangle edges
+                    var x01 = this.lerp(y0, x0, y1, x1)
+                    var x12 = this.lerp(y1, x1, y2, x2)
+                    console.log(y0,x0,y2,x2)
+                    var x02 = this.lerp(y0, x0, y2, x2)
+                    console.log("x02", x02)
+                    console.log("x01", x01)
+                    console.log("x12", x12)
+
+                    //concatenate short sides
+                    x01.pop()
+                    var x012 = x01.concat(x12)
+
+                    //determine which is left and right
+                    const m = Math.floor(x02.length / 2)
+                    if (x02[m] < x012[m]) {
+                        var x_left = x02
+                        var x_right = x012
+                        console.log("if", x_left)
+                    } else {
+                        var x_left = x012
+                        var x_right = x02
+                        console.log("eklse", x_left)
+                    }
+
+
+                    //draw horizontal segments
+                    for (var y = y0; y <= y2; y++) {
+                        for(var x = x_left[y-y0]; x <= x_right[y-y0]; x++) {
+                            this.putPixel(y,x, color_poly[0], color_poly[1], color_poly[2])
+                            }
+                    }
+
                     
-                //concatenate short sides
-                x01.pop()
-                var x012 = x01.concat(x12)
-                
-                //determine which is left and right
-                const m = Math.floor(x02.length / 2)
-                if (x02[m] < x012[m]) {
-                    var x_left = x02
-                    var x_right = x012
-                    console.log("if", x_left)
-                } else {
-                    var x_left = x012
-                    var x_right = x02
-                    console.log("eklse", x_left)
-                }
-                
-                 
-                //draw horizontal segments
-                for (var y = y0; y <= y2; y++) {
-                    for(var x = x_left[y-y0]; x <= x_right[y-y0]; x++) {
-                        this.putPixel(x,y, color_poly[0], color_poly[1], color_poly[2])
-                        }
-                }
-                
-                    
-                    
-                
-                
                 }
                 
                 
@@ -215,15 +218,13 @@ export class SVGRenderer {
     }
     
     
-   lerp (t0, y0, t1, y1) {
-       if (t0 == t1) {
-           return [y0]
-       }
+   lerp (i0, d0, i1, d1) {
+       let a = (d1 - d0) / (i1 - i0)
         const values = []
-        var y = y0
-        for (var t = t0; t <= t1; t++) {
-            values.push(y)
-            y += (y1-y0)/(t1-t0)
+        var d = d0
+        for (var i = i0; i <= i1; i++) {
+            values.push(d)
+            d = d + a
             
         }
         return values
