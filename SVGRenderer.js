@@ -120,7 +120,51 @@ export class SVGRenderer {
                 const pointsArray = parsePoints(e.points);
                 const triangles = triangulate(pointsArray);
                 // TODO
-                console.error("Polygon has not been implemented");
+                console.log(triangles)
+                const color_poly = parseRGB(e.stroke)
+                
+                for (var tri =0; tri < triangles.length; tri++){ //each triangle
+                
+                    x0 = triangles[tri][0][0]
+                    y0 = triangles[tri][0][1]
+                    x1 = triangles[tri][1][0]
+                    y1 = triangles[tri][1][1]
+                    var x2 = triangles[tri][2][0]
+                    var y2 = triangles[tri][2][1]
+                  
+                
+                if (y1 < y0 ){
+                    const old_x0 = x0
+                    const old_y0 = y0
+                    x0 = x1
+                    x1 = old_x0
+                    y0 = y1
+                    y1 = old_y0
+                }
+                if (y2 < y0 ){
+                    const old_x0 = x0
+                    const old_y0 = y0
+                    x0 = x2
+                    x2 = old_x0
+                    y0 = y2
+                    y2 = old_y0
+                }
+                if (y2 < y1 ){
+                    const old_x1 = x1
+                    const old_y1 = y1
+                    x1 = x2
+                    x2 = old_x1
+                    y1 = y2
+                    y2 = old_y1
+                }
+                console.log(y0,y1,y2)
+                
+                this.DrawLine(x0,y0,x1,y1, color_poly)
+                this.DrawLine(x1,y1,x2,y2, color_poly)
+                this.DrawLine(x0,y0,x2,y2, color_poly)
+                }
+                
+                
             }
         }
     }
@@ -163,6 +207,7 @@ export class SVGRenderer {
                 x1 = old_x0
                 y0 = y1
                 y1 = old_y0
+              
             }
 
             var ys = this.lerp(x0, y0, x1, y1)
@@ -202,11 +247,7 @@ export class SVGRenderer {
         }
     }
     
-    
-    
-    
-    
-    
+   
     
 }
 
