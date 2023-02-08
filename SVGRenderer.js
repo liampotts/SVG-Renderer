@@ -118,11 +118,23 @@ export class SVGRenderer {
                 }
 
             } else if (e.type === 'polygon') {
+                
+                
                 const pointsArray = parsePoints(e.points);
                 const triangles = triangulate(pointsArray);
                 // TODO
+                
+                console.log(triangles)
+                
                 const color_poly = parseRGB(e.fill)
-                console.log(color_poly)
+                const stroke_color = parseRGB(e.stroke)
+                
+                console.log(stroke_color)
+                
+                
+               
+                
+                
                 
                 for (var tri =0; tri < triangles.length; tri++){ //each triangle
                 
@@ -133,7 +145,6 @@ export class SVGRenderer {
                     var x2 = triangles[tri][2][0]
                     var y2 = triangles[tri][2][1]
                 
-                    
                     
                      //sort 
                     if (y1 < y0 ){
@@ -162,9 +173,8 @@ export class SVGRenderer {
                     }
 
 
-    //                this.DrawLine(x0,y0,x1,y1, color_poly)
-    //                this.DrawLine(x1,y1,x2,y2, color_poly)
-    //                this.DrawLine(x0,y0,x2,y2, color_poly)
+                    
+                  
 
                     //convert to canvas
                     const new_first = this.closestPixelTo(x0,y0)
@@ -198,6 +208,8 @@ export class SVGRenderer {
                         var x_right = x02
                     }
 
+                    
+                 
 
                     //draw horizontal segments
                     for (var y = y0; y <= y2; y++) {
@@ -209,9 +221,54 @@ export class SVGRenderer {
                     
                 }
                 
+                     
+            //need to go back to old coords the draw border in stroke_color not fill color
                 
-            }
+//                
+//                  for (var tri =0; tri < triangles.length; tri++){ //each triangle
+//                
+//                    var x0 = triangles[tri][0][0]
+//                    var y0 = triangles[tri][0][1]
+//                    var x1 = triangles[tri][1][0]
+//                    var y1 = triangles[tri][1][1]
+//                    var x2 = triangles[tri][2][0]
+//                    var y2 = triangles[tri][2][1]
+//                
+//
+//
+//     
+//              
+//            
+//            }
+//            
+                console.log(pointsArray)
+    
+//                //this.DrawLine(x0,y0,x1,y1, stroke_color)
+//                this.DrawLine(x1,y1,x2,y2, stroke_color)
+//                this.DrawLine(x2,y2,x0,y0, stroke_color)
+                
+                for (var i=0; i < pointsArray.length-1; i++){
+                   
+                   var x0 = pointsArray[i][0]
+                   var y0 = pointsArray[i][1]
+                   var x1 = pointsArray[i+1][0]
+                   var y1 = pointsArray[i+1][1]
+        
+                   this.DrawLine(x0,y0,x1,y1, stroke_color)
+                }
+                
+                var x0 = pointsArray[0][0]
+                var y0 = pointsArray[0][1]
+                var x1 = pointsArray[pointsArray.length-1][0]
+                var y1 = pointsArray[pointsArray.length-1][1]
+                this.DrawLine(x0,y0,x1,y1, stroke_color)
+            
+                
+        
+               //end of polyline  
         }
+        }
+        
     }
     
     
@@ -226,6 +283,9 @@ export class SVGRenderer {
         }
         return values
    }
+    
+    
+    
     
     DrawLine(x0,y0,x1,y1, color) { 
 
