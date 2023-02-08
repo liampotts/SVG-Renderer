@@ -73,54 +73,9 @@ export class SVGRenderer {
         
         return [Math.round((y*rowHeight)-(miny*rowHeight)), Math.round((x*colWidth)-(minx*colWidth))]
     }
-
-    render() {
-        /*
-        Put all the pixels to light up the elements in scene.elements. 
-        It will be necessary to parse the attributes of scene.elements, e.g. converting from strings to numbers.
-        */
-        for (const e of this.scene.elements) {
-            if (e.type === 'point') {
-                const x = Number(e.x);
-                const y = Number(e.y);
-                const color = parseRGB(e.color);
-                const alpha = Number(e.opacity) || 1;
-                const [row, col] = this.closestPixelTo(x, y);
-                this.putPixel(row, col, color[0], color[1], color[2], alpha);
-            } else if (e.type === 'line') {
-                // TODO
-                const x0 = Number(e.x1)
-                const y0 = Number(e.y1)
-                
-                const x1 = Number(e.x2)
-                const y1 = Number(e.y2)
-                
-                const color = parseRGB(e.stroke)
-                
-                this.DrawLine(x0,y0,x1,y1, color)
-                
-
-            } else if (e.type === 'polyline') {
-                // TODO
-                const color = parseRGB(e.stroke)
-                console.log(color)
-        
-                const points = parsePoints(e.points)
-                                
-                for (var i=0; i < points.length-1; i++){
-                   
-                   var x0 = points[i][0]
-                   var y0 = points[i][1]
-                   var x1 = points[i+1][0]
-                   var y1 = points[i+1][1]
-        
-                   this.DrawLine(x0,y0,x1,y1, color)
-                }
-
-            } else if (e.type === 'polygon') {
-                
-                
-                const pointsArray = parsePoints(e.points);
+    
+    polyline(e) {
+        const pointsArray = parsePoints(e.points);
                 const triangles = triangulate(pointsArray);
                 // TODO
                 
@@ -128,14 +83,21 @@ export class SVGRenderer {
                 
                 const color_poly = parseRGB(e.fill)
                 const stroke_color = parseRGB(e.stroke)
+                const fill_opacity = e['fill-opacity']
                 
-                console.log(stroke_color)
+                if (e['stroke-opacity'] >= 0) {
+                    console.log("if")
+                    var stroke_opacity = e['stroke-opacity']
+                    console.log(stroke_opacity)
+                    
+                }
+                else {
+                    console.log("else")
+                     var stroke_opacity = 1
+                }
                 
-                
-               
-                
-                
-                
+                console.log("stroke", stroke_opacity)
+                                 
                 for (var tri =0; tri < triangles.length; tri++){ //each triangle
                 
                     var x0 = triangles[tri][0][0]
@@ -171,10 +133,7 @@ export class SVGRenderer {
                         y1 = y2
                         y2 = old_y1
                     }
-
-
-                    
-                  
+    
 
                     //convert to canvas
                     const new_first = this.closestPixelTo(x0,y0)
@@ -208,65 +167,130 @@ export class SVGRenderer {
                         var x_right = x02
                     }
 
-                    
-                 
-
                     //draw horizontal segments
                     for (var y = y0; y <= y2; y++) {
                         for(var x = x_left[y-y0]; x <= x_right[y-y0]; x++) {
-                            this.putPixel(Math.round(y),Math.round(x), color_poly[0], color_poly[1], color_poly[2])
+                            this.blendPixel(Math.round(y),Math.round(x), color_poly[0], color_poly[1], color_poly[2], fill_opacity)
                             }
                     }
+                    
 
                     
                 }
                 
-                     
-            //need to go back to old coords the draw border in stroke_color not fill color
-                
-//                
-//                  for (var tri =0; tri < triangles.length; tri++){ //each triangle
-//                
-//                    var x0 = triangles[tri][0][0]
-//                    var y0 = triangles[tri][0][1]
-//                    var x1 = triangles[tri][1][0]
-//                    var y1 = triangles[tri][1][1]
-//                    var x2 = triangles[tri][2][0]
-//                    var y2 = triangles[tri][2][1]
-//                
-//
-//
-//     
-//              
-//            
-//            }
-//            
-                console.log(pointsArray)
-    
-//                //this.DrawLine(x0,y0,x1,y1, stroke_color)
-//                this.DrawLine(x1,y1,x2,y2, stroke_color)
-//                this.DrawLine(x2,y2,x0,y0, stroke_color)
-                
+               
                 for (var i=0; i < pointsArray.length-1; i++){
+                    console.log(stroke_opacity)
                    
                    var x0 = pointsArray[i][0]
                    var y0 = pointsArray[i][1]
                    var x1 = pointsArray[i+1][0]
                    var y1 = pointsArray[i+1][1]
         
-                   this.DrawLine(x0,y0,x1,y1, stroke_color)
+                   this.DrawLine(x0,y0,x1,y1, stroke_color, stroke_opacity)
                 }
-                
+
                 var x0 = pointsArray[0][0]
                 var y0 = pointsArray[0][1]
                 var x1 = pointsArray[pointsArray.length-1][0]
                 var y1 = pointsArray[pointsArray.length-1][1]
-                this.DrawLine(x0,y0,x1,y1, stroke_color)
-            
-                
+                this.DrawLine(x0,y0,x1,y1, stroke_color, stroke_opacity)
+                    
+    }
+    blendPixel(row, col, r, g, b, alpha) {
         
-               //end of polyline  
+         
+        //input needs to be in canvas coordinates not world
+     
+        /*
+        Update one pixel in the image array. (r,g,b) are 0-255 color values.
+        */
+        if (Math.round(row) != row) {
+            console.error("Cannot put pixel in fractional row");
+            return;
         }
+        if (Math.round(col) != col) {
+            console.error("Cannot put pixel in fractional col");
+            return;
+        }
+        if (row < 0 || row >= this.image.height) {
+            return;
+        }
+        if (col < 0 || col >= this.image.width) {
+            return;
+        }
+
+        //find background colors
+        const index = 4 * (this.image.width * row + col);
+        var bg_r = this.image.data[index + 0]
+        var bg_g = this.image.data[index + 1]
+        var bg_b = this.image.data[index + 2]
+        this.image.data[index + 3] = 255;
+        
+        //compute fg value
+        var blend_r = alpha*r + (1-alpha)*bg_r
+        var blend_g = alpha*g + (1-alpha)*bg_g
+        var blend_b = alpha*b + (1-alpha)*bg_b
+        
+
+        //set pixel value to fg value 
+        this.image.data[index + 0] = Math.round(blend_r);
+        this.image.data[index + 1] = Math.round(blend_g);
+        this.image.data[index + 2] = Math.round(blend_b);
+        this.image.data[index + 3] = 255; //might just be 255
+        
+        
+    }
+
+
+    render() {
+        /*
+        Put all the pixels to light up the elements in scene.elements. 
+        It will be necessary to parse the attributes of scene.elements, e.g. converting from strings to numbers.
+        */
+        for (const e of this.scene.elements) {
+            if (e.type === 'point') {
+                const x = Number(e.x);
+                const y = Number(e.y);
+                const color = parseRGB(e.color);
+                const alpha = Number(e.opacity) || 1;
+                const [row, col] = this.closestPixelTo(x, y);
+                this.blendPixel(row, col, color[0], color[1], color[2], alpha);
+            } else if (e.type === 'line') {
+                // TODO
+                const x0 = Number(e.x1)
+                const y0 = Number(e.y1)
+                
+                const x1 = Number(e.x2)
+                const y1 = Number(e.y2)
+                
+                const color = parseRGB(e.stroke)
+                
+                this.DrawLine(x0,y0,x1,y1, color)
+                
+
+            } else if (e.type === 'polyline') {
+                console.log("e.type",e)
+                // TODO
+                const color = parseRGB(e.stroke)
+                console.log(color)
+        
+                const points = parsePoints(e.points)
+                                
+                for (var i=0; i < points.length-1; i++){
+                   
+                   var x0 = points[i][0]
+                   var y0 = points[i][1]
+                   var x1 = points[i+1][0]
+                   var y1 = points[i+1][1]
+        
+                   this.DrawLine(x0,y0,x1,y1, color)
+                }
+
+            } else if (e.type === 'polygon') {
+                this.polyline(e)
+                  
+            }
         }
         
     }
@@ -287,7 +311,13 @@ export class SVGRenderer {
     
     
     
-    DrawLine(x0,y0,x1,y1, color) { 
+    DrawLine(x0,y0,x1,y1, color, alpha) { 
+        console.log("stroke-opacity in drawline", alpha)
+        if (typeof(alpha) == "undefined") {
+            console.log("undefined")
+            alpha = 1
+            console.log("new alpha", alpha)
+        }
 
         const new_first = this.closestPixelTo(x0,y0)
         y0 = new_first[0]
@@ -296,10 +326,8 @@ export class SVGRenderer {
         y1 = new_second[0]
         x1 = new_second[1]
         
-        
         var [r,g,b] = (color)
   
-        
         if (Math.abs(x1 - x0) > Math.abs(y1 - y0)) {
             // Line is horizontal-ish
             // Make sure x0 < x1
@@ -316,7 +344,7 @@ export class SVGRenderer {
             var ys = this.lerp(x0, y0, x1, y1)
             for (var i = 0; i < ys.length; i++) {
            
-                this.putPixel(Math.round((ys[i])), Math.round(x0+i), r, g, b)
+                this.blendPixel(Math.round((ys[i])), Math.round(x0+i), r, g, b, alpha)
             }
             
 //            for (var x = x0; x <= x1; x++) {
@@ -340,7 +368,7 @@ export class SVGRenderer {
             var xs = this.lerp(y0, x0, y1, x1)
 
             for (var i = 0; i < xs.length; i++) {
-                this.putPixel(Math.round(y0+i), Math.round(xs[i]), r,g,b)
+                this.blendPixel(Math.round(y0+i), Math.round(xs[i]), r,g,b, alpha )
             }
             
 //            for (var y = y0; y <= y1; y++) {
@@ -349,8 +377,6 @@ export class SVGRenderer {
 //            }
         }
     }
-    
-   
     
 }
 
