@@ -83,7 +83,20 @@ export class SVGRenderer {
                 
                 const color_poly = parseRGB(e.fill)
                 const stroke_color = parseRGB(e.stroke)
-                const fill_opacity = e['fill-opacity']
+              //  const fill_opacity = e['fill-opacity']
+                
+                if (e['fill-opacity'] >= 0) {
+                    console.log("if fill")
+                    var fill_opacity = e['fill-opacity']
+                    console.log(fill_opacity)
+                    
+                }
+                else {
+                    console.log("else")
+                     var fill_opacity = 1
+                     
+                }
+                
                 
                 if (e['stroke-opacity'] >= 0) {
                     console.log("if")
@@ -172,15 +185,11 @@ export class SVGRenderer {
                         for(var x = x_left[y-y0]; x <= x_right[y-y0]; x++) {
                             this.blendPixel(Math.round(y),Math.round(x), color_poly[0], color_poly[1], color_poly[2], fill_opacity)
                             }
-                    }
-                    
-
-                    
+                    }  
                 }
                 
                
                 for (var i=0; i < pointsArray.length-1; i++){
-                    console.log(stroke_opacity)
                    
                    var x0 = pointsArray[i][0]
                    var y0 = pointsArray[i][1]
@@ -194,6 +203,7 @@ export class SVGRenderer {
                 var y0 = pointsArray[0][1]
                 var x1 = pointsArray[pointsArray.length-1][0]
                 var y1 = pointsArray[pointsArray.length-1][1]
+                console.log("stroke color",stroke_color)
                 this.DrawLine(x0,y0,x1,y1, stroke_color, stroke_opacity)
                     
     }
