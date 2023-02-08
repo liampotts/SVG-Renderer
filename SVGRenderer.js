@@ -103,6 +103,7 @@ export class SVGRenderer {
             } else if (e.type === 'polyline') {
                 // TODO
                 const color = parseRGB(e.stroke)
+                console.log(color)
         
                 const points = parsePoints(e.points)
                                 
@@ -121,6 +122,7 @@ export class SVGRenderer {
                 const triangles = triangulate(pointsArray);
                 // TODO
                 const color_poly = parseRGB(e.fill)
+                console.log(color_poly)
                 
                 for (var tri =0; tri < triangles.length; tri++){ //each triangle
                 
@@ -160,9 +162,9 @@ export class SVGRenderer {
                     }
 
 
-                    this.DrawLine(x0,y0,x1,y1, color_poly)
-                    this.DrawLine(x1,y1,x2,y2, color_poly)
-                    this.DrawLine(x0,y0,x2,y2, color_poly)
+    //                this.DrawLine(x0,y0,x1,y1, color_poly)
+    //                this.DrawLine(x1,y1,x2,y2, color_poly)
+    //                this.DrawLine(x0,y0,x2,y2, color_poly)
 
                     //convert to canvas
                     const new_first = this.closestPixelTo(x0,y0)
@@ -179,11 +181,8 @@ export class SVGRenderer {
                     //computer x coordinates of triangle edges
                     var x01 = this.lerp(y0, x0, y1, x1)
                     var x12 = this.lerp(y1, x1, y2, x2)
-                    console.log(y0,x0,y2,x2)
                     var x02 = this.lerp(y0, x0, y2, x2)
-                    console.log("x02", x02)
-                    console.log("x01", x01)
-                    console.log("x12", x12)
+        
 
                     //concatenate short sides
                     x01.pop()
@@ -194,18 +193,16 @@ export class SVGRenderer {
                     if (x02[m] < x012[m]) {
                         var x_left = x02
                         var x_right = x012
-                        console.log("if", x_left)
                     } else {
                         var x_left = x012
                         var x_right = x02
-                        console.log("eklse", x_left)
                     }
 
 
                     //draw horizontal segments
                     for (var y = y0; y <= y2; y++) {
                         for(var x = x_left[y-y0]; x <= x_right[y-y0]; x++) {
-                            this.putPixel(y,x, color_poly[0], color_poly[1], color_poly[2])
+                            this.putPixel(Math.round(y),Math.round(x), color_poly[0], color_poly[1], color_poly[2])
                             }
                     }
 
