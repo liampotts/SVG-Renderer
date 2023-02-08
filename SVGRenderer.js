@@ -79,7 +79,7 @@ export class SVGRenderer {
                 const triangles = triangulate(pointsArray);
                 // TODO
                 
-                console.log(triangles)
+                //console.log(triangles)
                 
                 const color_poly = parseRGB(e.fill)
                 const stroke_color = parseRGB(e.stroke)
@@ -181,9 +181,9 @@ export class SVGRenderer {
                     }
 
                     //draw horizontal segments
-                    for (var y = y0; y <= y2; y++) {
-                        for(var x = x_left[y-y0]; x <= x_right[y-y0]; x++) {
-                            this.blendPixel(Math.round(y),Math.round(x), color_poly[0], color_poly[1], color_poly[2], fill_opacity)
+                    for (var y = y0; y < y2; y++) {
+                        for(var x = x_left[y-y0]; x < x_right[y-y0]; x++) {
+                            this.blendPixel(y,x, color_poly[0], color_poly[1], color_poly[2], fill_opacity)
                             }
                     }  
                 }
@@ -311,7 +311,7 @@ export class SVGRenderer {
         const values = []
         var d = d0
         for (var i = i0; i <= i1; i++) {
-            values.push(d)
+            values.push(Math.round(d))
             d = d + a
             
         }
