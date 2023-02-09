@@ -62,15 +62,6 @@ export class SVGRenderer {
 
         var rowHeight =((this.scene.height-1)/worldHeight)
         
-//        console.log("world with and height", worldWidth, worldHeight)
-//        console.log("viewbox", [minx, miny, worldWidth, worldHeight])
-//
-//        console.log("col width and row height", colWidth, rowHeight)
-//        console.log("x,y given", x,y)
- //       console.log("pts plotted", (Math.round((y)*rowHeight))-(miny*rowHeight), (Math.round((x)*colWidth))-(minx*colWidth))
-
-
-        
         return [Math.round((y*rowHeight)-(miny*rowHeight)), Math.round((x*colWidth)-(minx*colWidth))]
     }
     
@@ -78,41 +69,25 @@ export class SVGRenderer {
         const pointsArray = parsePoints(e.points);
                 const triangles = triangulate(pointsArray);
                 // TODO
-                
-                //console.log(triangles)
-                
+            
                 const color_poly = parseRGB(e.fill)
                 const stroke_color = parseRGB(e.stroke)
-              //  const fill_opacity = e['fill-opacity']
                 
                 if (e['fill-opacity'] >= 0) {
-                    console.log("if fill")
                     var fill_opacity = e['fill-opacity']
-                    console.log(fill_opacity)
-                    
                 }
                 else {
-                    console.log("else")
-                     var fill_opacity = 1
-                     
+                     var fill_opacity = 1  
                 }
-                
                 
                 if (e['stroke-opacity'] >= 0) {
-                    console.log("if")
-                    var stroke_opacity = e['stroke-opacity']
-                    console.log(stroke_opacity)
-                    
+                    var stroke_opacity = e['stroke-opacity']                    
                 }
                 else {
-                    console.log("else")
                      var stroke_opacity = 1
                 }
-                
-                console.log("stroke", stroke_opacity)
-                                 
+                                                 
                 for (var tri =0; tri < triangles.length; tri++){ //each triangle
-                
                     var x0 = triangles[tri][0][0]
                     var y0 = triangles[tri][0][1]
                     var x1 = triangles[tri][1][0]
@@ -146,7 +121,6 @@ export class SVGRenderer {
                         y1 = y2
                         y2 = old_y1
                     }
-    
 
                     //convert to canvas
                     const new_first = this.closestPixelTo(x0,y0)
@@ -187,10 +161,8 @@ export class SVGRenderer {
                             }
                     }  
                 }
-                
                
                 for (var i=0; i < pointsArray.length-1; i++){
-                   
                    var x0 = pointsArray[i][0]
                    var y0 = pointsArray[i][1]
                    var x1 = pointsArray[i+1][0]
@@ -203,7 +175,6 @@ export class SVGRenderer {
                 var y0 = pointsArray[0][1]
                 var x1 = pointsArray[pointsArray.length-1][0]
                 var y1 = pointsArray[pointsArray.length-1][1]
-                console.log("stroke color",stroke_color)
                 this.DrawLine(x0,y0,x1,y1, stroke_color, stroke_opacity)
                     
     }
@@ -280,10 +251,8 @@ export class SVGRenderer {
                 
 
             } else if (e.type === 'polyline') {
-                console.log("e.type",e)
                 // TODO
                 const color = parseRGB(e.stroke)
-                console.log(color)
         
                 const points = parsePoints(e.points)
                                 
@@ -322,11 +291,8 @@ export class SVGRenderer {
     
     
     DrawLine(x0,y0,x1,y1, color, alpha) { 
-        console.log("stroke-opacity in drawline", alpha)
         if (typeof(alpha) == "undefined") {
-            console.log("undefined")
             alpha = 1
-            console.log("new alpha", alpha)
         }
 
         const new_first = this.closestPixelTo(x0,y0)
@@ -353,15 +319,8 @@ export class SVGRenderer {
 
             var ys = this.lerp(x0, y0, x1, y1)
             for (var i = 0; i < ys.length; i++) {
-           
                 this.blendPixel(Math.round((ys[i])), Math.round(x0+i), r, g, b, alpha)
             }
-            
-//            for (var x = x0; x <= x1; x++) {
-//                
-//                this.putPixel(x, Math.round(ys[x-x0]), r,g,b)
-//            }
-           
             
         } else {
             // Line is vertical-ish
@@ -380,11 +339,6 @@ export class SVGRenderer {
             for (var i = 0; i < xs.length; i++) {
                 this.blendPixel(Math.round(y0+i), Math.round(xs[i]), r,g,b, alpha )
             }
-            
-//            for (var y = y0; y <= y1; y++) {
-//                
-//                this.putPixel(Math.round(xs[y-y0]), y, r,g,b)
-//            }
         }
     }
     
