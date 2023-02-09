@@ -1,0 +1,20 @@
+<svg width="150px" height="150px" viewBox="0 0 150 150">
+  <polygon fill="rgb(255, 150, 150)" points="75,0 150,100 75,100 0,100"/>
+  <polygon fill="rgb(150, 150, 255)" points="0,100 75,100 75,150 0,150"/>
+  <polygon fill="rgb(255, 255, 150)" points="75,100 150,100 150,150 75,150"/>
+    <polygon fill="rgb(165, 42, 42)" points="60,120 90,120 90,150 60,150"/>
+     <polygon fill="rgb(255, 255, 255)" points="30,60 55,60 55,85 30,85"/>
+         <polygon fill="rgb(255, 255, 255)" points="90,60 115,60 115,85 90,85"/>
+    
+     <line x1="42.5" y1="60" x2 = "42.5" y2="85" stroke="rgb(165, 42, 42)" />
+    <line x1="30" y1="72.5" x2 = "55" y2="72.5" stroke="rgb(165, 42, 42)" />
+    <line x1="102.5" y1="60" x2 = "102.5" y2="85" stroke="rgb(165, 42, 42)" />
+    <line x1="90" y1="72.5" x2 = "115" y2="72.5" stroke="rgb(165, 42, 42)" />
+    <point x="85" y="135" color="rgb(0,0,0)" />
+    <point x="86" y="135" color="rgb(0,0,0)" />
+    <point x="85" y="134" color="rgb(0,0,0)" />
+    <point x="86" y="134" color="rgb(0,0,0)" />
+     
+
+<!--<polygon points="60,120 90,120  60,150 90,150" fill="rgb(95,255,95)"/>-->
+</svg>
